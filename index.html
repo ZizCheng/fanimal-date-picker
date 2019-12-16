@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Airbnb</title>
+    <link rel="stylesheet" type="text/css" href="./css/bulma.css">
+
+  </head>
+  <body>
+
+
+  <!-- <section class="hero is-primary is-fullheight" style="background-image: url('https://a0.muscache.com/4ea/air/r:w3100-h2074-sfit,e:fjpg-c80/pictures/0ffd8594-f123-43f0-85bb-7ef88c6f0624.jpg'); background-repeat: no-repeat; background-size: 100% 100%;">
+    <div class="hero-head">
+      <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="">
+      </a>
+
+      <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navBar">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+      <div class="navbar-end" id="navBar">
+        <a class="navbar-item">
+          Help
+        </a>
+
+        <a class="navbar-item">
+          Sign up
+        </a>
+
+        <a class="navbar-item">
+          Log in
+        </a>
+    </div>
+  </div>
+  </nav> -->
+
+  <div class="container-fluid" style="margin-left: 29rem; margin-top: 4 rem;">
+    <div class="columns is-vcentered">
+        <div class="column is-one-quarter">
+                  <div class="card" style="width: 27rem; height: 30rem;  border-radius: 4px; box-shadow: rgba(0, 0, 0, 0.12) 0px 16px 40px !important; background-color: rgb(255, 255, 255) none repeat scroll 0% 0% !important; font-family:Circular, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif !important;">
+                    <div class="card-content">
+                      <h6 class="title has-text-black"> Book unique places to stay and things to do. </h2>
+                      <div class="columns">
+                          <div class="column is-half">
+                            <input class="input" value="" id="dateBegin" type="text" onclick="toggleCalendar()" placeholder="" readonly>
+                          </div>
+                          <div class="column is-half">
+                            <input class="input" value="" id="dateEnd" type="text" onclick="toggleCalendar()" placeholder="" readonly>
+                          </div>
+
+                      </div>
+                      <div class="card datepicker" id="calendar" style="position: fixed;">
+                        <div class="card-content">
+                            <div class="container" style="position: relative; display: block;">
+                                <div class="columns is-vcentered">
+                                  <div class="column is-one-fifth"><button onclick="calendarBackwards()" class="button"><i class="fas fa-arrow-left"></i></button></div>
+                                  <div class="column"> <h6 class="title is-6 has-text-black has-text-centered" id="CurrentDay">---</h6> </div>
+                                  <div class="column is-one-fifth" ><button class="button" onclick="calendarForward()"><i class="fas fa-arrow-right"></i></button></div>
+
+                                </div>
+                              <table class="table is-bordered">
+                                <thead>
+                                  <td style="border:none;"> Su </td>
+                                  <td style="border:none;"> M </td>
+                                  <td style="border:none;"> T </td>
+                                  <td style="border:none;"> W </td>
+                                  <td style="border:none;"> Th </td>
+                                  <td style="border:none;"> F </td>
+                                  <td style="border:none;"> Sa </td>
+
+
+
+
+                                </thead>
+                                <tbody class="is-hoverable" id="calendarBody">
+                                </tbody>
+                              </table>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+          </div>
+          <div class="column"></div>
+      </div>
+
+  </div>
+<div class="hero-body">
+
+
+</div>
+</section>
+<script src="./script.js"></script>
+<script src="https://kit.fontawesome.com/ec65ba9ed4.js" crossorigin="anonymous"></script>
+  </body>
+</html>
