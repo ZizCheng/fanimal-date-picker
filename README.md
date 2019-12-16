@@ -1,7 +1,8 @@
 # fanimal-date-picker
 
-To get started, install and include script.js in your webpage:
+To get started, install and include script.js in your webpage: 
 <script src="./script.js"></script>
+
 
 To implement the calendar into your website:
 <fanimal-calendar id="WholeCalendar"></fanimal-calendar>
