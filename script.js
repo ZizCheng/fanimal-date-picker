@@ -4,9 +4,11 @@ var secondSelected = null;
 var monthOffset = 0;
 var currentMonth = now.getMonth();
 var currentYear = now.getFullYear();
-calendar.hidden = true;
-populateCalendar(now.getFullYear(), now.getMonth())
-CurrentDay.textContent = now.toLocaleDateString('en-us', { year: 'numeric', month: 'long'})
+var calendar;
+
+// Initial Launch
+
+
 
 function getAllDaysInMonth(year, month){
   var days = []
@@ -24,6 +26,7 @@ function toggleCalendar() {
 
 
 function populateCalendar(y, m) {
+  calendarBody = WholeCalendar.shadowRoot.getElementById("calendarBody")
   days = getAllDaysInMonth(y, m);
   // Fill days so that they are organized.
   fillEmptyDays = days[0].getDay()
@@ -39,31 +42,31 @@ function populateCalendar(y, m) {
       else
       {
 
-        if(days[day+row*7] == "-"){
-          thisCell = currentRow.insertCell(day);
-          thisCell.textContent = ""
-        }
-        else
-        {
-          date = days[day+(row*7)]
-          thisCell = currentRow.insertCell(day);
-          thisCell.onclick = daySelected
-          thisCell.textContent = date.getDate();
+          if(days[day+row*7] == "-"){
+            thisCell = currentRow.insertCell(day);
+            thisCell.textContent = ""
+          }
+          else
+          {
+            date = days[day+(row*7)]
+            thisCell = currentRow.insertCell(day);
+            thisCell.onclick = daySelected
+            thisCell.textContent = date.getDate();
 
-          if(firstSelected != null && firstSelected.getTime() == date.getTime()){
-            thisCell.style["background-color"] = "#00d1b2"
-          }
-          if(secondSelected != null && secondSelected.getTime() == date.getTime()){
-            thisCell.style["background-color"] = "#00d1b2"
-          }
-          if(secondSelected != null && firstSelected != null && date.getTime() > firstSelected.getTime() && date.getTime() < secondSelected.getTime()){
-            thisCell.style["background-color"] = "rgba(0, 209, 178, 0.35)"
-          }
-          if(date.getTime() < now.getTime()){
-            thisCell.style["background-color"] = "#dddddd";
-          }
+            if(firstSelected != null && firstSelected.getTime() == date.getTime()){
+              thisCell.style["background-color"] = "#00d1b2"
+            }
+            if(secondSelected != null && secondSelected.getTime() == date.getTime()){
+              thisCell.style["background-color"] = "#00d1b2"
+            }
+            if(secondSelected != null && firstSelected != null && date.getTime() > firstSelected.getTime() && date.getTime() < secondSelected.getTime()){
+              thisCell.style["background-color"] = "rgba(0, 209, 178, 0.35)"
+            }
+            if(date.getTime() < now.getTime()){
+              thisCell.style["background-color"] = "#dddddd";
+            }
 
-        }
+          }
       }
 
     }
@@ -75,6 +78,8 @@ function populateCalendar(y, m) {
 
 
 function calendarForward() {
+  calendarBody = WholeCalendar.shadowRoot.getElementById("calendarBody")
+  CurrentDay = WholeCalendar.shadowRoot.getElementById("CurrentDay");
   calendarBody.innerHTML = ""
   monthOffset++;
   desiredYear = now.getFullYear() + (Math.floor((now.getMonth()+monthOffset)/12));
@@ -86,6 +91,8 @@ function calendarForward() {
 }
 
 function calendarBackwards() {
+  calendarBody = WholeCalendar.shadowRoot.getElementById("calendarBody")
+  CurrentDay = WholeCalendar.shadowRoot.getElementById("CurrentDay");
   calendarBody.innerHTML = ""
   monthOffset--;
   desiredYear = now.getFullYear() + (Math.floor((now.getMonth()+monthOffset)/12));
@@ -97,6 +104,7 @@ function calendarBackwards() {
 }
 
 function daySelected(ev){
+  calendarBody = WholeCalendar.shadowRoot.getElementById("calendarBody")
   selectedDay = parseInt(ev.srcElement.textContent)
   selectedDate = new Date(currentYear, currentMonth, selectedDay)
   if(selectedDate.getTime() < now.getTime()){
@@ -113,6 +121,8 @@ function daySelected(ev){
     }
     else {
       secondSelected = selectedDate
+      //output here
+      alert("dates chosen are: " + firstSelected + " until " + secondSelected)
     }
   }
   else {
@@ -122,25 +132,53 @@ function daySelected(ev){
 
   calendarBody.innerHTML = ""
   populateCalendar(currentYear, currentMonth)
+}
 
+class Calendar extends HTMLElement {
 
-  if(firstSelected != null){
-    dateBegin.value = firstSelected.toLocaleDateString("en-us")
+  constructor() {
+    super();
+    const template = document.createElement('template');
+    template.innerHTML = this.render();
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    shadowRoot.appendChild(template.content.cloneNode(true));
+
   }
-  else {
-    dateBegin.value = ""
-  }
-  if(secondSelected != null){
-    dateEnd.value = secondSelected.toLocaleDateString("en-us")
-  }
-  else {
-    dateEnd.value = ""
+
+  render(){
+    return `<div class="datepicker" id="calendar" style="position: fixed;">
+          <div class="">
+              <div class="container" style="position: relative; display: block;">
+                  <div class="columns is-vcentered">
+                    <div class="column is-one-fifth"><button onclick="calendarBackwards()" class="button"><i class="fas fa-arrow-left">backwards</i></button></div>
+                    <div class="column"> <h6 class="title is-6 has-text-black has-text-centered" id="CurrentDay">---</h6> </div>
+                    <div class="column is-one-fifth" ><button class="button" onclick="calendarForward()"><i class="fas fa-arrow-right">forward</i></button></div>
+                  </div>
+                <table class="table is-bordered">
+                  <thead>
+                    <td style="border:none;"> Su </td>
+                    <td style="border:none;"> M </td>
+                    <td style="border:none;"> T </td>
+                    <td style="border:none;"> W </td>
+                    <td style="border:none;"> Th </td>
+                    <td style="border:none;"> F </td>
+                    <td style="border:none;"> Sa </td>
+                  </thead>
+                  <tbody id="calendarBody">
+                  </tbody>
+                </table>
+              </div>
+          </div>
+          </div>`
   }
 }
 
-// dateBegin.addEventListener('focusout', (event) => {
-//   calendar.hidden = true;
-// });
-// dateEnd.addEventListener('focusout', (event) => {
-//   calendar.hidden = true;
-// });
+customElements.define('fanimal-calendar', Calendar);
+
+
+window.onload = function() {
+  calendar = WholeCalendar.shadowRoot.getElementById("calendar");
+  CurrentDay = WholeCalendar.shadowRoot.getElementById("CurrentDay");
+  populateCalendar(now.getFullYear(), now.getMonth())
+  CurrentDay.textContent = now.toLocaleDateString('en-us', { year: 'numeric', month: 'long'})
+}
