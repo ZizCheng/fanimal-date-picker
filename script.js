@@ -13,8 +13,9 @@ class Calendar extends HTMLElement {
       highlightedDate: "#00d1b2",
       inBetweenDate: "rgba(0, 209, 178, 0.35)",
       invalidDate: "#dddddd",
-      hoverDate: "#00d1b2"
-
+      hoverDate: "#00d1b2",
+      border: "#d3d3d3",
+      fontFamily: "Arial, Helvetica, sans-serif"
     }
 
 
@@ -168,52 +169,101 @@ class Calendar extends HTMLElement {
     return `
     <style>
       fanimal-calendar .focused {
-        background-color: ${this.config.highlightedDate}
+        background-color: ${this.config.highlightedDate};
       }
       fanimal-calendar .focused:hover {
-        background-color: ${this.config.hoverDate}
+        background-color: ${this.config.hoverDate};
       }
       fanimal-calendar .in {
-        background-color: ${this.config.inBetweenDate}
+        background-color: ${this.config.inBetweenDate};
       }
       fanimal-calendar .in:hover {
-        background-color: ${this.config.hoverDate}
+        background-color: ${this.config.hoverDate};
       }
       fanimal-calendar .invalid {
-        background-color: ${this.config.invalidDate}
+        background-color: ${this.config.invalidDate};
       }
-      fanimal-calendar .valid:hover {
-        background-color: ${this.config.hoverDate}
+      fanimal-calendar .valid:not(.in):not(.focused):hover {
+        color: ${this.config.hoverDate};
       }
 
+      fanimal-calendar .table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        margin: auto;
+      }
+      fanimal-calendar td {
+        font-size: 1rem;
+        border: 1px solid ${this.config.border};
+        padding: 8px;
+        text-align: center;
+        font-family: ${this.config.fontFamily};
+      }
+      fanimal-calendar td:not(.invalid) {
+        cursor: pointer;
+      }
+      fanimal-calendar tbody td:not(.invalid):not(.valid) {
+        visibility: hidden;
+        border: none;
+      }
+      fanimal-calendar .column {
+        padding: 24px 0;
+      }
+      fanimal-calendar .column .title {
+        font-size: 1.75rem;
+        margin: 0 8px;
 
+        display: inline-block;
+        font-family: ${this.config.fontFamily};
+      }
+      fanimal-calendar .column input {
+        font-size: 1.5rem;
+        background-color: white;
+        border-radius: 2px;
+        border: 1px solid ${this.config.border};
+        cursor: pointer;
 
+        display: inline-block;
+        font-family: ${this.config.fontFamily};
+      }
+      fanimal-calendar .column .left-arrow {
+        float: left;
+      }
+      fanimal-calendar .column .right-arrow {
+        float: right;
+      }
     </style>
 
 
     <div class="datepicker" id="calendar" style="position: fixed;">
-          <div class="">
-              <div class="container" style="position: relative; display: block;">
-                  <div class="columns is-vcentered">
-                    <input type="button" value="backwards" direction="-1"></input>
-                    <div class="column"> <h6 class="title is-6 has-text-black has-text-centered" id="MonthLabel">${ (new Date(this.currentYear, this.currentMonth).toLocaleDateString('en-us', { year: 'numeric', month: 'long'})) }</h6> </div>
-                    <input type="button" value="forwards" direction="1"></input>
-                  </div>
-                <table class="table is-bordered">
-                  <thead>
-                    <td style="border:none;"> Su </td>
-                    <td style="border:none;"> M </td>
-                    <td style="border:none;"> T </td>
-                    <td style="border:none;"> W </td>
-                    <td style="border:none;"> Th </td>
-                    <td style="border:none;"> F </td>
-                    <td style="border:none;"> Sa </td>
-                  </thead>
-                  ${this.populateCalendar().outerHTML}
-                </table>
+      <div class="">
+          <div class="container" style="position: relative; display: block;">
+              <div class="columns is-vcentered">
+
+                <div class="column">
+                  <input class="left-arrow" type="button" value="&larr;" direction="-1"></input>
+                  <p class="title is-6 has-text-black has-text-centered" id="MonthLabel">
+                    ${ (new Date(this.currentYear, this.currentMonth).toLocaleDateString('en-us', { year: 'numeric', month: 'long'})) }
+                  </p>
+                  <input class="right-arrow" type="button" value="&rarr;" direction="1"></input>
+                </div>
+
               </div>
+            <table class="table is-bordered">
+              <thead>
+                <td style="border:none;"> Su </td>
+                <td style="border:none;"> M </td>
+                <td style="border:none;"> T </td>
+                <td style="border:none;"> W </td>
+                <td style="border:none;"> Th </td>
+                <td style="border:none;"> F </td>
+                <td style="border:none;"> Sa </td>
+              </thead>
+              ${this.populateCalendar().outerHTML}
+            </table>
           </div>
-          </div>`
+        </div>
+      </div>`
   }
 }
 
