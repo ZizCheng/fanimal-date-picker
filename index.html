@@ -2,9 +2,16 @@
 <html>
   <head>
     <title>Fanimal Calendar Example/Test</title>
+    <link rel="stylesheet" href="css/example.css">
   </head>
   <body>
-    <fanimal-calendar></fanimal-calendar>
+    <fanimal-calendar id="test"></fanimal-calendar>
     <script src="./script.js"></script>
+    <script>
+      test.addEventListener("onFirstDateSelected", function(e) {
+        console.log(e.detail.firstSelected)
+      })
+
+    </script>
   </body>
 </html>

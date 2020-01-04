@@ -1,148 +1,203 @@
-//Initialize variables
-const now = new Date();
-var firstSelected = null;
-var secondSelected = null;
-var monthOffset = 0;
-var currentMonth = now.getMonth();
-var currentYear = now.getFullYear();
-var calendar;
+class Calendar extends HTMLElement {
 
-function getAllDaysInMonth(year, month){
-  var days = []
-  var date = new Date(year, month, 1);
-  while(date.getMonth() === month){
-    days.push(new Date(date));
-    date.setDate(date.getDate() + 1)
+  constructor() {
+    super();
+    this.now = new Date();
+    this.firstSelected = null;
+    this.secondSelected = null;
+    this.monthOffset = 0;
+    this.currentMonth = this.now.getMonth();
+    this.currentYear = this.now.getFullYear();
+
+    this.config = {
+      highlightedDate: "#00d1b2",
+      inBetweenDate: "rgba(0, 209, 178, 0.35)",
+      invalidDate: "#dddddd",
+      hoverDate: "#00d1b2"
+
+    }
+
+
+    this.addEventListener("click", this.handleClick)
   }
-  return days;
-}
 
-function toggleCalendar() {
-  calendar.hidden = !calendar.hidden;
-}
+  setConfig(options){
+    this.config = options;
+  }
 
-function populateCalendar() {
-  //empty the current calendar
-  document.getElementById("calendarBody").innerHTML = "";
+  getAllDaysInMonth(year, month){
+    var days = []
+    var date = new Date(year, month, 1);
+    while(date.getMonth() === month){
+      days.push(new Date(date));
+      date.setDate(date.getDate() + 1)
+    }
 
-  //save for later
-  calendarBody = document.getElementById("calendarBody");
-  days = getAllDaysInMonth(currentYear, currentMonth);
+    var fillEmptyDays = days[0].getDay()
+    fillEmptyDays = fillEmptyDays < 0 ? 0 : fillEmptyDays
+    days = (new Array(fillEmptyDays).fill(null)).concat(days)
 
-  // Fill days so that they are organized.
-  fillEmptyDays = days[0].getDay()
-  fillEmptyDays = fillEmptyDays < 0 ? 0 : fillEmptyDays
-  days = (new Array(fillEmptyDays).fill(null)).concat(days)
+    return days;
+  }
 
-  //population:
-  //per week/row:
-  for(var row = 0; row < Math.ceil(days.length / 7); row++ ){
-    currentRow = calendarBody.insertRow(row);
+  populateCalendar() {
+    var days = this.getAllDaysInMonth(this.currentYear, this.currentMonth);
 
-    //per day/date:
-    for(var day = 0; day < 7; day++){
+    var tbody = document.createElement("tbody")
+     for(var row = 0; row < Math.ceil(days.length / 7); row++ ){
+       var currentRow = tbody.insertRow(row);
 
-      //make sure still within month
-      if(!(day+(row*7) >= days.length)){
-        thisCell = currentRow.insertCell(day);
+       //per day/date:
+       for(var day = 0; day < 7; day++){
 
-        //null means should be empty
-        if(days[day+row*7] == null){
-          thisCell.textContent = "";
-        }
-        else
-        {
-          date = days[day+(row*7)]
-          thisCell.onclick = daySelected
-          thisCell.textContent = date.getDate();
+         //make sure still within month
+         if(!(day+(row*7) >= days.length)){
+           var thisCell = currentRow.insertCell(day);
 
-          if((firstSelected != null && firstSelected.getTime() == date.getTime()) || (secondSelected != null && secondSelected.getTime() == date.getTime())){
-            thisCell.style["background-color"] = "#00d1b2" //first/second selected color
-          }
-          if(secondSelected != null && firstSelected != null && date.getTime() > firstSelected.getTime() && date.getTime() < secondSelected.getTime()){
-            thisCell.style["background-color"] = "rgba(0, 209, 178, 0.35)" //in between colors
-          }
-          if(date.getTime() < now.getTime()){
-            thisCell.style["background-color"] = "#dddddd"; //gray out days that have already passed
-          }
-        }
+           //null means should be empty
+           if(days[day+row*7] == null){
+             thisCell.textContent = "";
+           }
+           else
+           {
+             var date = days[day+(row*7)]
+             thisCell.setAttribute("date", date)
+             thisCell.textContent = date.getDate();
+            thisCell.setAttribute("class", "valid")
+             if((this.firstSelected != null && this.firstSelected.getTime() == date.getTime()) || (this.secondSelected != null && this.secondSelected.getTime() == date.getTime())){
+               thisCell.setAttribute("class", "valid focused") //first/second selected color
+             }
+             if(this.secondSelected != null && this.firstSelected != null && date.getTime() > this.firstSelected.getTime() && date.getTime() < this.secondSelected.getTime()){
+               thisCell.setAttribute("class", "valid in") //in between colors
+             }
+             if(date.getTime() < this.now.getTime()){
+               thisCell.setAttribute("class", "invalid"); //gray out days that have already passed
+             }
+
+
+           }
+         }
+       }
+     }
+
+
+
+
+    return tbody;
+  }
+
+  handleClick(ev){
+    if(ev.srcElement.getAttribute("type") == "button"){
+      var btnValue = parseInt(ev.srcElement.getAttribute("direction"))
+      this.moveMonth(btnValue);
+      console.log(btnValue)
+      return
+    }
+    //save for later
+    var selectedDay = parseInt(ev.srcElement.textContent)
+    var selectedDate = new Date(ev.srcElement.getAttribute("date"))
+
+
+
+
+    // Checks if the target element is a 'td'
+    if(selectedDate == null){return}
+    //if selected time is in past
+    if(selectedDate.getTime() < this.now.getTime()){
+      return;
+    }
+
+    //nothing selected as first
+    if(this.firstSelected == null){
+      this.firstSelected = selectedDate
+
+      var ev_firstSelected = new CustomEvent("onFirstDateSelected", {detail: {firstSelected: this.firstSelected}})
+      this.dispatchEvent(ev_firstSelected)
+    }
+
+    //something selected as first
+    else if(this.secondSelected == null){
+
+      //if second selected is before first selected
+      if(this.firstSelected.getTime() > selectedDate.getTime()){
+        this.firstSelected = selectedDate
+        var ev_firstSelected = new CustomEvent("onFirstDateSelected", {detail: {firstSelected: this.firstSelected}})
+        this.dispatchEvent(ev_firstSelected)
+        this.secondSelected = null
+      }
+      else {
+        this.secondSelected = selectedDate
+        var ev_secondSelected = new CustomEvent("onSecondDateSelected", {detail: {secondSelected: this.secondSelected}})
+        this.dispatchEvent(ev_secondSelected)
+        //output here
       }
     }
-  }
-  //change the month name
-  document.getElementById("MonthLabel").textContent = new Date(currentYear, currentMonth).toLocaleDateString('en-us', { year: 'numeric', month: 'long'});
-}
 
-function moveMonth(direction) {
-  //change initial variables for populateCalendar
-  monthOffset += direction;
-  currentYear = now.getFullYear() + (Math.floor((now.getMonth()+monthOffset)/12));
-  currentMonth = ((now.getMonth()+monthOffset) % 12);
-  populateCalendar();
-}
-function calendarForward() {
-  moveMonth(1);
-}
-function calendarBackwards() {
-  moveMonth(-1);
-}
-
-function daySelected(ev){
-  //save for later
-  calendarBody = document.getElementById("calendarBody")
-  selectedDay = parseInt(ev.srcElement.textContent)
-  selectedDate = new Date(currentYear, currentMonth, selectedDay)
-
-  //if selected time is in past
-  if(selectedDate.getTime() < now.getTime()){
-    return;
-  }
-
-  //nothing selected as first
-  if(firstSelected == null){
-    firstSelected = selectedDate
-  }
-
-  //something selected as first
-  else if(secondSelected == null){
-
-    //if second selected is before first selected
-    if(firstSelected.getTime() > selectedDate.getTime()){
-      firstSelected = selectedDate
-      secondSelected = null
-    }
+    //if both first and second selected, start as new
     else {
-      secondSelected = selectedDate
-      //output here
-      alert("dates chosen are: " + firstSelected + " until " + secondSelected)
+      this.firstSelected = selectedDate
+      var ev_firstSelected = new CustomEvent("onFirstDateSelected", {detail: {firstSelected: this.firstSelected}})
+      this.dispatchEvent(ev_firstSelected)
+      this.secondSelected = null;
     }
+
+    this.innerHTML = this.render();
   }
 
-  //if both first and second selected, start as new
-  else {
-    firstSelected = selectedDate
-    secondSelected = null;
-  }
-  populateCalendar()
-}
+  moveMonth(direction) {
+    // ((n % m) + m) % m  <- true modulo operator. JS uses % as remainder
+    //change initial variables for populateCalendar
+    this.monthOffset += direction;
+    this.currentYear = this.now.getFullYear() + (Math.floor((this.now.getMonth()+this.monthOffset)/12));
+    this.currentMonth = (((this.now.getMonth()+this.monthOffset) + 12) % 12);
+    this.innerHTML = this.render();
 
-//tag stuff:
-class Calendar extends HTMLElement {
+    var ev = new CustomEvent("onMonthMoved")
+
+    this.dispatchEvent(ev)
+  }
 
   //called when element is added into HTML
   connectedCallback() {
     this.innerHTML = this.render();
-    populateCalendar()
+
   }
   //the HTML part
   render(){
-    return `<div class="datepicker" id="calendar" style="position: fixed;">
+
+    return `
+    <style>
+      fanimal-calendar .focused {
+        background-color: ${this.config.highlightedDate}
+      }
+      fanimal-calendar .focused:hover {
+        background-color: ${this.config.hoverDate}
+      }
+      fanimal-calendar .in {
+        background-color: ${this.config.inBetweenDate}
+      }
+      fanimal-calendar .in:hover {
+        background-color: ${this.config.hoverDate}
+      }
+      fanimal-calendar .invalid {
+        background-color: ${this.config.invalidDate}
+      }
+      fanimal-calendar .valid:hover {
+        background-color: ${this.config.hoverDate}
+      }
+
+
+
+    </style>
+
+
+    <div class="datepicker" id="calendar" style="position: fixed;">
           <div class="">
               <div class="container" style="position: relative; display: block;">
                   <div class="columns is-vcentered">
-                    <div class="column is-one-fifth"><button onclick="calendarBackwards()" class="button"><i class="fas fa-arrow-left">backwards</i></button></div>
-                    <div class="column"> <h6 class="title is-6 has-text-black has-text-centered" id="MonthLabel">---</h6> </div>
-                    <div class="column is-one-fifth" ><button class="button" onclick="calendarForward()"><i class="fas fa-arrow-right">forward</i></button></div>
+                    <input type="button" value="backwards" direction="-1"></input>
+                    <div class="column"> <h6 class="title is-6 has-text-black has-text-centered" id="MonthLabel">${ (new Date(this.currentYear, this.currentMonth).toLocaleDateString('en-us', { year: 'numeric', month: 'long'})) }</h6> </div>
+                    <input type="button" value="forwards" direction="1"></input>
                   </div>
                 <table class="table is-bordered">
                   <thead>
@@ -154,8 +209,7 @@ class Calendar extends HTMLElement {
                     <td style="border:none;"> F </td>
                     <td style="border:none;"> Sa </td>
                   </thead>
-                  <tbody id="calendarBody">
-                  </tbody>
+                  ${this.populateCalendar().outerHTML}
                 </table>
               </div>
           </div>

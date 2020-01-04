@@ -1,6 +1,6 @@
 # fanimal-date-picker
 
-To get started, install and include script.js in your webpage: 
+To get started, install and include script.js in your webpage:
 `<script src="./script.js"></script>`
 
 To implement the calendar into your website:
@@ -14,3 +14,34 @@ Behavior:
 3. Clicking the same day twice selects it as the start and end date.
 
 Index.html provided is an example of usage.
+
+## Config
+### setConfig(options)
+sets settings for styling
+```
+{
+  highlightedDate: value,
+  inBetweenDate: value,
+  invalidDate: value,
+  hoverDate: value
+}
+
+
+```
+
+
+## onEvents
+### Both events return an object ev that contains another object detail which contains the object firstSelected or secondSelected (depending on the event).
+For example:
+```
+.addEventListener("onFirstDateSelected", function(ev){
+  console.log(ev.detail.firstSelected)
+  })
+
+
+```
+prints the first selected
+#### onFirstDateSelected
+An event named onFirstDateSelected is dispatched when the first date is selected.
+#### onSecondDateSelected
+An event named onFirstDateSelected is dispatched when the second date is selected.
