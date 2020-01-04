@@ -5,13 +5,29 @@
     <link rel="stylesheet" href="css/example.css">
   </head>
   <body>
-    <fanimal-calendar id="test"></fanimal-calendar>
     <script src="./script.js"></script>
+    <fanimal-calendar id="test"></fanimal-calendar>
+    <p id="output"></p>
     <script>
-      test.addEventListener("onFirstDateSelected", function(e) {
-        console.log(e.detail.firstSelected)
-      })
+      var outputStr = "";
 
+      
+      test.addEventListener("onFirstDateSelected", function(e) {
+        console.log(e.detail.firstSelected);
+        outputStr = "You selected the days from " + formatDate(e.detail.firstSelected) + " to ";
+      });
+      test.addEventListener("onSecondDateSelected", function(e) {
+        outputStr += formatDate(e.detail.secondSelected);
+        document.getElementById("output").innerHTML = outputStr;
+      });
+
+      function formatDate(date)
+      {
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        return month + "/" + day + "/" + year;
+      }
     </script>
   </body>
 </html>
